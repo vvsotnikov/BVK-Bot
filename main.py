@@ -1,46 +1,31 @@
 import json
 import logging
+import os
 
 import requests
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
-from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler, ConversationHandler)
-
-token = open('token.txt', 'r').read()
-
-url = f'https://api.telegram.org/bot{token}/'
-volumeRequest = 'https://api.crex24.com/CryptoExchangeService/BotPublic/Return24Volume?request=[NamePairs=BTC_BVK]'
-tickerRequest = 'https://api.crex24.com/CryptoExchangeService/BotPublic/ReturnTicker?request=[NamePairs=BTC_BVK]'
-
-# Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-CHOOSING, RESPONSE = range(2)
-reply_keyboard = [['Текущий курс / Current ticker',
-                       'Объем торгов / Market volume',
-                       'ПЯТЬ ТЫЩ!!! / FIVE THOUSAND!!!']]
-markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler)
 
 
 # TODO: add docstrings
 def get_volume():
-    response = json.loads(requests.get(volumeRequest))
-    # TODO: handle situations when response['Error'] is not None
+    response = json.loads(requests.get(volumeRequest).content)
+    # TODO: handle situations when answer['Error'] is not None
     return {'BTC': response['VolumeBTC'],
             'USD': response['VolumeUSD']}
 
 
 def get_tickers():
-    response = json.loads(requests.get(tickerRequest))
-    # TODO: handle situations when response['Error'] is not None
-    return {'Last': response['Last'] * 100000000,
-            'LowPrice': response['LowPrice'] * 100000000,
-            'HighPrice': response['LowPrice'] * 100000000,
-            'PercentChange': response['PercentChange'], }
+    response = json.loads(requests.get(tickerRequest).content)
+    # TODO: handle situations when answer['Error'] is not None
+    return {'Last': response['Tickers'][0]['Last'] * 100000000,
+            'LowPrice': response['Tickers'][0]['LowPrice'] * 100000000,
+            'HighPrice': response['Tickers'][0]['LowPrice'] * 100000000,
+            'PercentChange': response['Tickers'][0]['PercentChange'], }
 
 
 def shout_five():
-    logger.info('ПЯТЬ ТЫЩ!!! FIVE THOUSAND!!!')
+    return 'ПЯТЬ ТЫЩ!!! FIVE THOUSAND!!!'
 
 
 chooses_dict = {'volume': get_volume,
@@ -51,33 +36,27 @@ chooses_dict = {'volume': get_volume,
 def start(bot, update):
     update.message.reply_text(
         'Привет! Я -  Бот Биткоина Пять Тыщ. Я могу поделиться с тобой иннформацией о торгах на бирже или крикнуть'
-        '"ПЯТЬ ТЫЩ!" Возможно, когда-нибудь ты сможешь покупать и продавать Биткоин Пять Тыщ с моей помощью ;)'
+        '"ПЯТЬ ТЫЩ!" Возможно, когда-нибудь ты сможешь покупать и продавать Биткоин Пять Тыщ с моей помощью ;)\n'
         'Hi! My name is Bitcoin Five Thousand Bot. I can provide you real-time information about BVK market or just '
-        'shout "FIVE THOUSAND!!!',
-        reply_markup=markup)
-    return CHOOSING
+        'shout "FIVE THOUSAND!!!', reply_markup=markup)
+    logger.info(f'User {update.message.from_user} started the conversation.')
 
 
-def choice(bot, update):
-    update.message.reply_text('Что мне сдедать?\nWhat do you want?')
-    return RESPONSE
-
-
-# TODO: implement separate state for each request
-def response(bot, update):
+# TODO: implement separate handlers for each request
+def answer(bot, update):
     text = update.message.text
     for key in chooses_dict.keys():
         if key in text:
-            chooses_dict[key]()
+            update.message.reply_text(chooses_dict[key]())
             return CHOOSING
-    logger.info('Некорректный запрос! Incorrect request!')
-    return CHOOSING
+    update.message.reply_text('Некорректный запрос! Incorrect request!')
+    return RESPONSE
 
 
 def cancel(bot, update):
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
-    update.message.reply_text('Bye! I hope we can talk again some day.',
+    update.message.reply_text('Бот выключен. Bot is disabled',
                               reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
@@ -95,18 +74,9 @@ def main():
     dp = updater.dispatcher
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-
-        states={
-            CHOOSING: [RegexHandler('^(ticker|volume|FIVE)$', choice)],
-            RESPONSE: [MessageHandler(Filters.text, response)]
-        },
-
-        fallbacks=[CommandHandler('cancel', cancel)]
-    )
-
-    dp.add_handler(conv_handler)
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("cancel", cancel))
+    dp.add_handler(MessageHandler(Filters.text, answer))
 
     # log all errors
     dp.add_error_handler(error)
@@ -121,4 +91,22 @@ def main():
 
 
 if __name__ == '__main__':
+    # Enable logging
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    try:
+        token = os.environ.get('TOKEN ', open('token.txt', 'r').read())
+    except:
+        logger.warning('CAN NOT RETRIEVE TOKEN!')
+
+    url = f'https://api.telegram.org/bot{token}/'
+    volumeRequest = 'https://api.crex24.com/CryptoExchangeService/BotPublic/Return24Volume?request=[NamePairs=BTC_BVK]'
+    tickerRequest = 'https://api.crex24.com/CryptoExchangeService/BotPublic/ReturnTicker?request=[NamePairs=BTC_BVK]'
+
+    CHOOSING, RESPONSE = range(2)
+    reply_keyboard = [['Текущий курс / Current ticker',
+                       'Объем торгов / Market volume',
+                       'ПЯТЬ ТЫЩ!!! / FIVE THOUSAND!!!']]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
     main()
