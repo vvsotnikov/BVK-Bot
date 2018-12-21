@@ -11,17 +11,17 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Conv
 def get_volume():
     response = json.loads(requests.get(volumeRequest).content)
     # TODO: handle situations when answer['Error'] is not None
-    return {'BTC': response['VolumeBTC'],
-            'USD': response['VolumeUSD']}
+    return f"Объем торгов в BTC: {response['VolumeBTC']}\n" \
+           f"Объем торгов в USD: {response['VolumeUSD']}"
 
 
 def get_tickers():
     response = json.loads(requests.get(tickerRequest).content)
     # TODO: handle situations when answer['Error'] is not None
-    return {'Last': response['Tickers'][0]['Last'] * 100000000,
-            'LowPrice': response['Tickers'][0]['LowPrice'] * 100000000,
-            'HighPrice': response['Tickers'][0]['LowPrice'] * 100000000,
-            'PercentChange': response['Tickers'][0]['PercentChange'], }
+    return f"Цена последней сделки: {response['Tickers'][0]['Last'] * 100000000} сатоши\n" \
+           f"Ордеры на продажу от {response['Tickers'][0]['LowPrice'] * 100000000} сатоши\n" \
+           f"Ордеры на покупку от {response['Tickers'][0]['LowPrice'] * 100000000} сатоши\n" \
+           f"Изменение курса за сутки: {response['Tickers'][0]['PercentChange']}%"
 
 
 def shout_five():
