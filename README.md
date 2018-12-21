@@ -5,7 +5,7 @@
 ## Функционал / Features
 - Просмотр текущего курса на бирже / Get BTC-BVK exchange rates
 - Просмотр объема торгов / Get BVK market volume
-- ПЯТЬ ТЫЩ!!! / ПЯТЬ ТЫЩ!!!
+- ПЯТЬ ТЫЩ!!! / FIVE THOUSAND!!!
 
 ## Планируемые функции / TODO
 - Более удобочитаемый вывод данных / Fancier UI
