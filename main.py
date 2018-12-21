@@ -96,7 +96,7 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     try:
-        token = os.environ.get('TOKEN', open('token.txt', 'r').read())
+        token = os.environ.get('BVK_TOKEN', open('token1.txt', 'r').read())
     except:
         logger.warning('CAN NOT RETRIEVE TOKEN!')
 
