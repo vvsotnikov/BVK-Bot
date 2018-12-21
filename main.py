@@ -95,10 +95,10 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     logger = logging.getLogger(__name__)
 
-    try:
-        token = os.environ.get('BVK_TOKEN', open('token1.txt', 'r').read())
-    except:
-        logger.warning('CAN NOT RETRIEVE TOKEN!')
+    token = os.environ.get('BVK_TOKEN')
+    if token is None:
+        token = open('token.txt', 'r').read()
+    assert token is not None, logger.warning('CAN NOT RETRIEVE TOKEN!')
 
     volumeRequest = 'https://api.crex24.com/CryptoExchangeService/BotPublic/Return24Volume?request=[NamePairs=BTC_BVK]'
     tickerRequest = 'https://api.crex24.com/CryptoExchangeService/BotPublic/ReturnTicker?request=[NamePairs=BTC_BVK]'
