@@ -1,6 +1,6 @@
 # BVK Bot
 Телеграм-бот для bitcoin5000 (BVK) / Telegram bot for bitcoin5000 (BVK)
-Контрибуторы всячески приветствуются! Contributors are welcomed!
+#### Контрибуторы всячески приветствуются! Contributors are welcomed!
 
 ## Функционал / Features
 - Просмотр текущего курса на бирже / Get BTC-BVK exchange rates
