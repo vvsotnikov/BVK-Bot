@@ -20,7 +20,7 @@ def get_tickers():
     # TODO: handle situations when answer['Error'] is not None
     return f"Цена последней сделки: {response['Tickers'][0]['Last'] * 100000000} сатоши\n" \
            f"Ордеры на продажу от {response['Tickers'][0]['LowPrice'] * 100000000} сатоши\n" \
-           f"Ордеры на покупку от {response['Tickers'][0]['LowPrice'] * 100000000} сатоши\n" \
+           f"Ордеры на покупку от {response['Tickers'][0]['HighPrice'] * 100000000} сатоши\n" \
            f"Изменение курса за сутки: {response['Tickers'][0]['PercentChange']}%"
 
 
