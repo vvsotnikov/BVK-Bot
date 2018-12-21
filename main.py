@@ -96,11 +96,10 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     try:
-        token = os.environ.get('TOKEN ', open('token.txt', 'r').read())
+        token = os.environ.get('TOKEN', open('token.txt', 'r').read())
     except:
         logger.warning('CAN NOT RETRIEVE TOKEN!')
 
-    url = f'https://api.telegram.org/bot{token}/'
     volumeRequest = 'https://api.crex24.com/CryptoExchangeService/BotPublic/Return24Volume?request=[NamePairs=BTC_BVK]'
     tickerRequest = 'https://api.crex24.com/CryptoExchangeService/BotPublic/ReturnTicker?request=[NamePairs=BTC_BVK]'
 
