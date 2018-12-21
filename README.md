@@ -8,7 +8,7 @@
 - ПЯТЬ ТЫЩ!!! / FIVE THOUSAND!!!
 
 ## Планируемые функции / TODO
-- Более удобочитаемый вывод данных / Fancier UI
+✅ Более удобочитаемый вывод данных / Fancier UI
 - Code of Conduct
 - Добавить стикеры / Add stickers
 - Мониторинг нод и майнеров / Get stats about active nodes and miners
